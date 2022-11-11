@@ -1,0 +1,32 @@
+#cloud-config
+version: v1
+
+# Hostname will get expanded when running the script 'fgl-create.sh'
+hostname: {{ hostname }}
+fqdn: futuregadgetlab.org
+packages_update: true
+#packages_upgrade: false
+
+users:
+  - name: sysadmin
+    ssh-authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj5dlxJHPFYqgFWQIkhAKi8Mt303lqMXn9tzVKCyJPRbXo7GH9q/wQ67vg2DYRjEzZ1LvEXsBtr4sD1TC6gcbSXu8a216yIZGhoAbFlJshVHORpDfz/XdhUhNdMeLWuxy28OWzlqBxqcLH/mpNvXBXf43vg7L9nVAUb59Xx2ypQZoB0Awyc50lAJ/Gfl3msLR4mSmrppA/8Fu28qvORSSYcvyMx2Qf2Y03COuOqgGmo2QdWuLQs2WC6fU5oDbToRLVbRiL0Doi7ZUuwx5m12rHAOINE11taSCliAQinwj9OWx/98cJYI6DkOSMYrpWBuU9wtFIWxyQad5oLrJCFk1MgOrrk/wBGPUWba138/qspHJ6WuV7ubskC3mCzpvJ5bvXTB+KdcZkxeSmS3Vr4jQwKhhNqcDkw8UZ0ksSDXfiaZOX7ID2H8dfexgNXySSnYy51vADTehfVe93ZEJTLErGx63IE2IIQjW5hSqhxvZeoAMARV+UO/I+CNuVpbtAzdM= fgl-station 
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCyVl8oR7SP1i1UCa/3Imve9kEVqitST3/KeKcvbuwSxSSfDMy50r9i/OG9hN0gi6mKVMBGr51jOax0hu42mU3n2uno5Qr+NacoFzB6v2Er1rXXx9k89ca2rOOb4ltu4cLryiTbPgyENj2+Zdw5J/sNyIr9z9wRgIqWpbYQyKn93qWmt/23hJcYsStxwNf8cXKXt9TjIuWH1G6W4DOUC0IM1bFInsBVrK6lJunA/3EaVpmWI/FmcKC16Tnek9MPOnvOMhDSjkdFKd/b/6TK2C702A9DOADEAOaSFpXupPDys9uLZHsfJB2PfvcoZ6C/HW78mzsZcrUh2oni+nFAyiEAtyaZzGyXp4QZ3pcduowKj617gRUsRI2PR8LGtYqOey/l0Ln/Az0V/M9QP+ASf2Zkfcpqmpip9iUv3Ja7RLmuzWjEeaeFkKg+54TildB/SHCkvW03afD/d92Ez2ao0G27R2B2BNresxyC3n3pJnSEJkGZQXVg6HfKICb07bkOwtM= fgl-kvm
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    groups: sudo
+    shell: /bin/bash
+
+# Qemu-guest-agent configuration
+write_files:
+  - path: /etc/apparmor.d/abstractions/libvirt-qemu
+    content: /var/lib/libvirt/qemu/channel/target/* rw
+  
+  - path: /etc/cloud/cloud-init.disabled
+
+packages:
+  - qemu-guest-agent
+
+runcmd: 
+  # Restart the qemu-agent process
+  - kill $(pidof qemu-ga)
+  - /usr/sbin/qemu-ga -d

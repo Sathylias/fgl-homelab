@@ -1,0 +1,53 @@
+---
+- name: Updating & Upgrading system packages
+  become: True
+  become_method: sudo
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 86400
+    upgrade: yes
+
+- name:  Installing NFS Kernel Server
+  become: True
+  become_method: sudo
+  ansible.builtin.apt:
+    name: nfs-kernel-server
+    state: present
+
+- name: Ensure the NFS Server service is running
+  become: True
+  become_method: sudo
+  ansible.builtin.systemd:
+    name: nfs-server
+    state: started
+
+- name: Ensure the NFS Server service is enabled
+  become: True
+  become_method: sudo
+  ansible.builtin.systemd:
+    name: nfs-server
+    enabled: True
+    masked: no
+
+- name: Creating NFS Mount Directory
+  become: True
+  become_method: sudo
+  ansible.builtin.file:
+    path: "{{ nfs_mount_dir }}"
+    state: directory
+    owner: nobody
+    group: nogroup
+    mode: '0777'
+
+- name: Configuring the NFS Exports file
+  become: True
+  become_method: sudo
+  ansible.builtin.copy:
+    dest: "/etc/exports"
+    content: |
+      {{ nfs_mount_dir }} {{ nfs_export_subnet }}(rw,sync,no_subtree_check,no_root_squash)
+
+- name: Exporting the NFS configuration 
+  become: True
+  become_method: sudo
+  ansible.builtin.shell: exportfs -a 

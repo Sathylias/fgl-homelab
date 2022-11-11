@@ -1,0 +1,5 @@
+nfs_clients: [ "fgl-docker", "fgl-nfs01" ]
+nfs_mount_dir: /mnt/nfs-share
+
+nfs_export_subnet: 192.168.0.0/24
+

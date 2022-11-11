@@ -1,0 +1,17 @@
+---
+- name: Configure NFS Server (Future Gadget Lab)
+  hosts: fgl-nfs01
+  become: yes
+  become_user: root
+  
+  tasks:
+  - name: Updating system packages
+    ansible.builtin.apt:
+      update_cache: yes
+      cache_valid_time: 86400
+      upgrade: yes
+
+  - name: 
+    ansible.builtin.apt:
+      name: nfs-kernel-server
+      state: present

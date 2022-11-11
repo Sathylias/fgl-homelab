@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2155
+# set -x
+# set -eou pipefail
+#
+# Program: fglab
+# Description: Helper to create virtual machines on KVM with sane default
+#
+# Author: Maxime Daraiche <maxiscoding@gmail.com>
+#
+#/ Usage: fgl-create [OPTIONS]... [ARGUMENTS]...
+#/
+#/ 
+#/ OPTIONS
+#/   -h, --help
+#/                Print this help message
+#/
+#/   
+#/ EXAMPLES
+#/  $ fgl-create -i (For interactive session)
+#/ 
+# PREREQUISITES:
+#   - KVM / QEMU / LIBVIRT / BRIDGE NETWORK configured on the host
+
+FGL_VERSION='0.1'
+
+. fglenv.sh
+
+# Default PATH where the VMs are stored
+#FGL_DISK_PATH="/data/images"
+
+#FGL_TEMPLATE_PATH="/data/template"
+
+# Path to our cloud-init config
+#FGL_CLOUD_INIT_PATH="/data/cloud-init"
+
+# Virtual Machine default value
+FGL_DEFAULT_RAM=1024
+FGL_DEFAULT_VCPUS=1
+FGL_DEFAULT_DISKSIZE=25
+
+# Boy, what a very useful wizardry, jolly good !
+usage() { grep '^#/' "$0" | cut -c4- && exit 0; }
+
+parse_arguments() {
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --help|-h)
+	    usage
+	    ;;
+    esac
+  done
+}
+
+fgl_setup() {
+    check_dir "${FGL_DISK_PATH}"
+    check_dir "${FGL_CLOUD_INIT_PATH}"
+}
+
+check_dir() {
+    directory="$1"
+
+    [[ ! -d "${directory}" ]] && echo "${directory} directory does not exist, exiting.." && exit 1
+}
+
+main() {
+
+    parse_arguments "$@"
+
+    fgl_setup 
+
+    echo -e "fgl_create v${FGL_VERSION}\n"
+
+    read -p $'\e[32mVM Name\e[0m: ' vm_name
+    read -e -p $'\e[32mImage to be used\e[0m: ' -i "${FGL_TEMPLATE_PATH}" template
+    read -e -p $'\e[32mWhich cloud-init config\e[0m: ' -i "${FGL_CLOUD_INIT_PATH}" cloud_init
+
+    cp -rp "${cloud_init}" /tmp/"${vm_name}.tmp"
+
+    sed -i "s/{{ hostname }}/${vm_name}/g" "/tmp/${vm_name}.tmp" 
+
+    VMPATH="${FGL_DISK_PATH}/${vm_name}"
+
+    cp -p $template "${VMPATH}.qcow2"
+    
+    qemu-img resize "${VMPATH}.qcow2" 25G
+
+    virt-install \
+        --name ${vm_name} \
+        --disk path="${VMPATH}.qcow2" \
+        --ram=${FGL_DEFAULT_RAM}\
+        --vcpus=${FGL_DEFAULT_VCPUS} \
+        --cpu host \
+        --virt-type kvm \
+        --os-variant debian10 \
+        --network bridge=br0 \
+        --hvm \
+        --import \
+        --graphics vnc \
+        --noautoconsole \
+        --channel unix,target_type=virtio,name=org.qemu.guest_agent.0 \
+        --cloud-init user-data="/tmp/${vm_name}.tmp"
+}
+
+main "$@"

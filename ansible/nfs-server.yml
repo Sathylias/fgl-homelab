@@ -1,0 +1,6 @@
+---
+- name: NFS Kernel Server Installation
+  hosts: fgl-nfs01
+  remote_user: sysadmin
+  roles: 
+    - nfs-server
