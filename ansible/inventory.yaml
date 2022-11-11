@@ -2,12 +2,7 @@ virtualmachines:
   hosts:
     fgl-nfs01:
       ansible_host: 192.168.0.130 
-  vars:
-    ansible_user: sysadmin
-
-dockercontainers: 
-  hosts:
-    fgl-docker:
-      ansible_host: 192.168.0.120
+    fgl-docker: 
+      ansible_host: 192.168.0.242
   vars:
     ansible_user: sysadmin
