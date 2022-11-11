@@ -1,6 +1,9 @@
 ## What ?
 
-Useful scripts, tools and Ansible roles for the management of my KVM Homelab
+Useful scripts, tools, Docker & Ansible roles for the management of my KVM Homelab
+
+FYI: FGL stands for 'Future Gadget Lab', which is a pseudo-organization in the Steins
+Gate anime
 
 ## How ?
 
