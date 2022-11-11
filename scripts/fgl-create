@@ -24,20 +24,12 @@
 
 FGL_VERSION='0.1'
 
-. fglenv.sh
-
-# Default PATH where the VMs are stored
-#FGL_DISK_PATH="/data/images"
-
-#FGL_TEMPLATE_PATH="/data/template"
-
-# Path to our cloud-init config
-#FGL_CLOUD_INIT_PATH="/data/cloud-init"
+source fgl-environment
 
 # Virtual Machine default value
-FGL_DEFAULT_RAM=1024
-FGL_DEFAULT_VCPUS=1
-FGL_DEFAULT_DISKSIZE=25
+FGL_DEFAULT_RAM=4096 #1024
+FGL_DEFAULT_VCPUS=2 #1
+FGL_DEFAULT_DISKSIZE=100
 
 # Boy, what a very useful wizardry, jolly good !
 usage() { grep '^#/' "$0" | cut -c4- && exit 0; }
@@ -83,7 +75,7 @@ main() {
 
     cp -p $template "${VMPATH}.qcow2"
     
-    qemu-img resize "${VMPATH}.qcow2" 25G
+    qemu-img resize "${VMPATH}.qcow2" "${FGL_DEFAULT_DISKSIZE}"G
 
     virt-install \
         --name ${vm_name} \
