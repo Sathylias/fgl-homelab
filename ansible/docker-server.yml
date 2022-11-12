@@ -1,5 +1,5 @@
 ---
-- name: Docker Kernel Server Installation
+- name: Docker Server Installation
   hosts: fgl-docker
   remote_user: sysadmin
   roles: 
