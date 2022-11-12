@@ -1,7 +1,6 @@
 ---
 - name: Updating & Upgrading system packages
   become: True
-  become_method: sudo
   ansible.builtin.apt:
     update_cache: yes
     cache_valid_time: 86400
@@ -9,7 +8,6 @@
 
 - name: Installing Docker Prerequisites packages
   become: True
-  become_method: sudo
   ansible.builtin.apt:
     pkg: 
       - ca-certificates
@@ -21,48 +19,65 @@
 
 - name: Creating Docker GPG Keyring directory
   become: True
-  become_method: sudo
   ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
 
 - name: Adding Docker GPG Keys
   become: True
-  become_method: sudo
   ansible.builtin.shell: | 
     curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  args:
+    # Only run this if the GPG file does not exist
+    creates: /etc/apt/keyrings/docker.gpg
 
 - name: Adding the Docker repository 
   become: True
-  become_method: sudo
   ansible.builtin.shell: |
     echo \
     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
     $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  args:
+    # Only run this if the repository file does not exist
+    creates: /etc/apt/sources.list.d/docker.list
 
 - name: Installing Docker Engine and dependencies
   become: True
-  become_method: sudo
   ansible.builtin.apt:
     pkg: 
       - docker-ce 
       - docker-ce-cli 
       - containerd.io 
-      - docker-compose-plugin
+      - docker-compose
     state: latest
     update_cache: true
 
 - name: Adding Admin user to the Docker group
   become: True
-  become_method: sudo
   ansible.builtin.user:
     name: sysadmin
     groups: docker
     append: yes
 
 - name: Adding Docker-Compose configurations files to the server
-  become: True
-  become_method: sudo
   ansible.builtin.copy:
     src: docker
     dest: /home/sysadmin
+
+############
+# DOKUWIKI #
+############
+
+- name: Copy the existing Dokuwiki Configuration
+  ansible.builtin.copy:
+    src: /backup/dokuwiki/conf
+    dest: /home/sysadmin/.config/dokuwiki/dokuwiki/conf
+  tags: update-config
+  
+- name: Copy the existing Dokuwiki Database
+  ansible.builtin.copy:
+    src: /backup/dokuwiki/data
+    dest: /home/sysadmin/.config/dokuwiki/dokuwiki
+  tags: update-config
+
+# Start our docker containers somewhere around here
