@@ -1,0 +1,17 @@
+version: '3'
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Canada/Toronto
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ${HOME}/.config/nginx-proxy-manager:/data
+      - ${HOME}/.config/letsencrypt:/etc/letsencrypt

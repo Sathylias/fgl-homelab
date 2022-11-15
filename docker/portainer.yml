@@ -1,0 +1,17 @@
+---
+version: "2.1"
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Canada/Toronto
+    volumes:
+      - ${HOME}/.config/portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock 
+    ports:
+      - 0.0.0.0:9000:9000
+      - 0.0.0.0:9443:9443
+    restart: unless-stopped
