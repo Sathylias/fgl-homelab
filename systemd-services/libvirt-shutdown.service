@@ -1,0 +1,13 @@
+[Unit]
+Description=Pre-Shutdown Processes (KVM)
+DefaultDependencies=no
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+User=devops
+Group=devops
+ExecStart=/home/devops/fgl-homelab/scripts/pre-shutdown.sh
+
+[Install]
+WantedBy=halt.target reboot.target shutdown.target
