@@ -1,0 +1,14 @@
+---
+servers:
+
+  - hostname: fgl-testing
+    source: https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-generic-amd64.qcow2
+    disk_size: 10737418240
+    cpu_count: 1
+    ram: 1024
+
+  - hostname: fgl-testing02
+    source: https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-generic-amd64.qcow2
+    disk_size: 10737418240
+    cpu_count: 1
+    ram: 2048
