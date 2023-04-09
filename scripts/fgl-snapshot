@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2155
+# set -x
+# set -eou pipefail
+#
+# Program: fgl-snapshot
+# Description: Helper to create disk snapshots
+#
+# Author: Maxime Daraiche <maxiscoding@gmail.com>
+#
+#/ Usage: fgl-snapshot [OPTIONS]... [ARGUMENTS]...
+#/
+#/ 
+#/ OPTIONS
+#/   -h, --help
+#/                Print this help message
+#/
+#/   
+#/ EXAMPLES
+#/
+
+# Boy, what a very useful wizardry, jolly good !
+usage() { grep '^#/' "$0" | cut -c4- && exit 0; }
+
+parse_arguments() {
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --help|-h)
+	    usage
+	    ;;
+    esac
+  done
+}
+
+main() {
+
+    parse_arguments "$@"
+
+         
+
+}
+
+main "$@"
