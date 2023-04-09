@@ -1,0 +1,32 @@
+---
+- name: Updating & Upgrading system packages
+  become: True
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 86400
+    upgrade: yes
+
+- name: Installing required PHP Packages
+  become: True
+  ansible.builtin.apt:
+    name: "{{ php_packages }}" 
+
+- name: Installing mysql & nginx packages
+  become: True
+  ansible.builtin.apt:
+    name: "{{ packages }}" 
+
+- name: Secure our MariaDB Installation
+  become: True
+  expect:
+    command: mysql_secure_installation
+    responses:
+      'Enter current password for root': ''
+      'Set root password': 'n'
+      'Remove anonymous users': 'y'
+      'Disallow root login remotely': 'y'
+      'Remove test database': 'y'
+      'Reload privilege tables now': 'y'
+    timeout: 1
+  register: secure_mariadb
+  failed_when: "'... Failed!' in secure_mariadb.stdout_lines"
