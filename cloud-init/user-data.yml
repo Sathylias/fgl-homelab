@@ -22,7 +22,7 @@ write_files:
   
   - path: /etc/cloud/cloud-init.disabled
 
-# Install qemu-guest-agent to retireve information about our servers
+# Install qemu-guest-agent to retrieve information about our servers
 packages:
   - qemu-guest-agent
 
