@@ -1,5 +1,5 @@
 terraform {
   backend "local" {
-    path = "/data/libvirt-lab/terraform.tfstate"
+    path = "/data/terraform.tfstate"
   }
 }
