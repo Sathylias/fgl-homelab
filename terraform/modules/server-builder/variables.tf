@@ -18,7 +18,7 @@ variable "qemu_agent" {
 variable "wait_for_lease" {
   description = "Should terraform wait for the IP to be available ?"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "volume_pool" {
@@ -39,7 +39,7 @@ variable "user_data" {
   default     = ""
 }
 
-variable "ram" {
+variable "memory" {
   description = "Quantity of RAM allocated to our server"
   type        = number
   default     = 1024
@@ -71,6 +71,18 @@ variable "is_autostart" {
 
 variable "image_source" {
   description = "Location of the ISO image to be used"
+  type        = string
+  default     = ""
+}
+
+variable "ansible_group" {
+  description = "The Ansible group to be used for this machine"
+  type        = string
+  default     = ""
+}
+
+variable "description" {
+  description = "The description / title of the virtual machine"
   type        = string
   default     = ""
 }
