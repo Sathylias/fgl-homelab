@@ -4,10 +4,11 @@
 # in other various scripts & tools
 
 # Specify where we store our different Cloud Images
-FGL_TEMPLATE_PATH="/data/template"
+FGL_TEMPLATE_PATH="/data/isos"
 
 # Specify where the VMs are to be stored
 FGL_DISK_PATH="/data/images"
 
+# Location of cloud-init scripts to be used
 FGL_CLOUD_INIT_PATH="/data/cloud-init"
 

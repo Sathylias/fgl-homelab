@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2155
-# set -x
+#set -x
 # set -eou pipefail
 #
 # Program: fglab
@@ -27,9 +27,12 @@ FGL_VERSION='0.1'
 source fgl-environment
 
 # Virtual Machine default value
-FGL_DEFAULT_RAM=4096 #1024
-FGL_DEFAULT_VCPUS=2 #1
-FGL_DEFAULT_DISKSIZE=100
+FGL_DEFAULT_RAM=1024
+FGL_DEFAULT_VCPUS=1
+FGL_DEFAULT_DISKSIZE=20
+
+# Export some variables for envsubst
+export HOSTNAME
 
 # Boy, what a very useful wizardry, jolly good !
 usage() { grep '^#/' "$0" | cut -c4- && exit 0; }
@@ -38,60 +41,59 @@ parse_arguments() {
   while [[ "$#" -gt 0 ]]; do
     case "$1" in
       --help|-h)
-	    usage
-	    ;;
+	usage
+	;;
+      *)
+        shift
+        ;;
     esac
   done
 }
 
-fgl_setup() {
-    check_dir "${FGL_DISK_PATH}"
-    check_dir "${FGL_CLOUD_INIT_PATH}"
+setup_environment() {
+  check_dir "${FGL_DISK_PATH}"
+  check_dir "${FGL_CLOUD_INIT_PATH}"
 }
 
 check_dir() {
-    directory="$1"
+  directory="$1"
 
-    [[ ! -d "${directory}" ]] && echo "${directory} directory does not exist, exiting.." && exit 1
+  [[ ! -d "${directory}" ]] && echo "${directory} directory does not exist, exiting.." && exit 1
 }
 
 main() {
 
-    parse_arguments "$@"
+  parse_arguments "$@"
+  setup_environment
 
-    fgl_setup 
+  echo -e "fgl_create v${FGL_VERSION}\n"
 
-    echo -e "fgl_create v${FGL_VERSION}\n"
+  read -p $'\e[32mVM Name\e[0m: ' HOSTNAME
+  read -e -p $'\n\e[32mImage to be used\e[0m: ' -i "${FGL_TEMPLATE_PATH}" IMAGE_FILE
+  read -e -p $'\n\e[32mWhich cloud-init config\e[0m: ' -i "${FGL_CLOUD_INIT_PATH}" CLOUD_INIT_FILE
 
-    read -p $'\e[32mVM Name\e[0m: ' vm_name
-    read -e -p $'\e[32mImage to be used\e[0m: ' -i "${FGL_TEMPLATE_PATH}" template
-    read -e -p $'\e[32mWhich cloud-init config\e[0m: ' -i "${FGL_CLOUD_INIT_PATH}" cloud_init
+  cp -rp "${CLOUD_INIT_FILE}" "/tmp/cloud-init_${HOSTNAME}.yml"
+  # Substitutes our cloud-init.yml file with our exported variables
+  envsubst < "/tmp/${HOSTNAME}.yml" > "/tmp/${HOSTNAME}_rendered.yml"
+  VMPATH="${FGL_DISK_PATH}/${HOSTNAME}"
+  cp -p "${IMAGE_FILE}" "${VMPATH}.qcow2"
+  qemu-img resize "${VMPATH}.qcow2" "${FGL_DEFAULT_DISKSIZE}"G
 
-    cp -rp "${cloud_init}" /tmp/"${vm_name}.tmp"
-
-    sed -i "s/{{ hostname }}/${vm_name}/g" "/tmp/${vm_name}.tmp" 
-
-    VMPATH="${FGL_DISK_PATH}/${vm_name}"
-
-    cp -p $template "${VMPATH}.qcow2"
-    
-    qemu-img resize "${VMPATH}.qcow2" "${FGL_DEFAULT_DISKSIZE}"G
-
-    virt-install \
-        --name ${vm_name} \
-        --disk path="${VMPATH}.qcow2" \
-        --ram=${FGL_DEFAULT_RAM}\
-        --vcpus=${FGL_DEFAULT_VCPUS} \
-        --cpu host \
-        --virt-type kvm \
-        --os-variant debian10 \
-        --network bridge=br0 \
-        --hvm \
-        --import \
-        --graphics vnc \
-        --noautoconsole \
-        --channel unix,target_type=virtio,name=org.qemu.guest_agent.0 \
-        --cloud-init user-data="/tmp/${vm_name}.tmp"
+  virt-install \
+    --name "${HOSTNAME}" \
+    --disk path="${VMPATH}.qcow2" \
+    --ram=${FGL_DEFAULT_RAM}\
+    --vcpus=${FGL_DEFAULT_VCPUS} \
+    --cpu host \
+    --virt-type kvm \
+    --os-variant debian10 \
+    --network bridge=br0 \
+    --hvm \
+    --import \
+    --graphics vnc \
+    --noautoconsole \
+    --channel unix,target_type=virtio,name=org.qemu.guest_agent.0 \
+    --cloud-init user-data="/tmp/${HOSTNAME}_rendered.yml"
 }
 
 main "$@"
