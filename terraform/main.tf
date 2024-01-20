@@ -14,6 +14,7 @@ module "server-builder" {
   for_each = { for k, v in try(var.servers, {}) : k => v }
 
   hostname      = "${local.prefix}-${each.key}"
+  domain        = "${each.value.domain}"
   image_source  = "${each.value.source}"
   disk_size     = "${each.value.disk_size_gb}"
   cpu_count     = "${each.value.cpu_count}"
