@@ -20,8 +20,8 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
   name      = "cloudinit-${var.hostname}.iso"
   pool      = "${var.volume_pool}"
   user_data = templatefile("${var.user_data}", {
-      hostname = "${var.hostname}"
-      domain   = "${var.domain}"
+    hostname = "${var.hostname}"
+    domain   = "${var.domain}"
   })
 }
 

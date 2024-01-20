@@ -6,7 +6,6 @@ variable "hostname" {
 variable "domain" { 
   description = "The default server's domain"
   type        = string 
-  default     = "futuregadgetlab.org"
 }
 
 variable "qemu_agent" {
@@ -26,12 +25,6 @@ variable "volume_pool" {
   type        = string
   default     = "images"
 }
-
-# variable "image" {
-#   description = "Name of the image to be used for the server (QCOW2, IMG, RAW, etc.)"
-#   type        = string
-#   default     = ""
-# }
 
 variable "user_data" {
   description = "Location of the user_data template file"
