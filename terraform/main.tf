@@ -25,9 +25,12 @@ module "server-builder" {
 }
 
 #--------------------------------------------------------------------
-# Ansible Groups Definition
+# Ansible Manager Module Definition
 #--------------------------------------------------------------------
-resource "ansible_group" "group" {
-  for_each = { for k, v in try(var.servers, {}) : v.ansible_group => v }
-  name     = "${each.value.ansible_group}"
+module "ansible-manager" {
+  source = "./modules/ansible-manager"
+
+  ansible_groups = distinct([
+    for instance in var.servers : instance.ansible_group
+  ])
 }
