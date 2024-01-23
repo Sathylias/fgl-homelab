@@ -5,7 +5,3 @@ output "ip" {
 output "hostname" {
   value = libvirt_domain.server.name
 }
-
-output "ansible_group" {
-  value = libvirt_domain.server.description
-}
