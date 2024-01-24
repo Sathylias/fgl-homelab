@@ -3,7 +3,7 @@ output "host_data" {
     for instance in module.server-builder :
     instance.hostname => {
       ip            = instance.ip,
-      #ansible_group = instance.ansible_group
+      ansible_group = instance.ansible_group
     }
   }
 }
