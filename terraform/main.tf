@@ -30,7 +30,18 @@ module "server-builder" {
 module "ansible-manager" {
   source = "./modules/ansible-manager"
 
+  # Create our Ansible Groups based by building a list of distinct values
+  # obtained from our TFVARS server's definition
   ansible_groups = distinct([
     for instance in var.servers : instance.ansible_group
   ])
+
+  # Create our Ansible Hosts by merging the group and IP of the server
+  ansible_hosts = {
+    for instance in module.server-builder :
+    instance.hostname => {
+      ip            = instance.ip,
+      ansible_group = instance.ansible_group
+    }
+  }
 }
