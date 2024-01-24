@@ -23,13 +23,13 @@ servers = {
     ansible_group = "nfsserver"
   }
 
-  checkmk-01 = {
-    source        = "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2"
-    disk_size_gb  = 20
-    cpu_count     = 2
-    memory        = 4096
-    description   = "CheckMK Server"
-    domain        = "futuregl.org"
-    ansible_group = "checkmkserver"
-  }
+  #checkmk-01 = {
+    #source        = "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2"
+    #disk_size_gb  = 20
+    #cpu_count     = 2
+    #memory        = 4096
+    #description   = "CheckMK Server"
+    #domain        = "futuregl.org"
+    #ansible_group = "checkmkserver"
+  #}
 }
