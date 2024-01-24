@@ -1,3 +1,7 @@
+locals {
+  ansible_group = var.ansible_group
+}
+
 #--------------------------------------------------------------------
 # Libvirt Volumes Definition
 #--------------------------------------------------------------------
@@ -23,18 +27,6 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
     hostname = "${var.hostname}"
     domain   = "${var.domain}"
   })
-}
-
-#--------------------------------------------------------------------
-# Ansible Host Definition
-#--------------------------------------------------------------------
-resource "ansible_host" "host" {
-  name   = "${libvirt_domain.server.network_interface[0].addresses[0]}"
-  groups = [ "${var.ansible_group}" ]
-  
-  depends_on = [ 
-    libvirt_domain.server 
-  ]
 }
 
 #--------------------------------------------------------------------
